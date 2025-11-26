@@ -283,7 +283,15 @@ static void lua_resetthread_cb(void *user_data) {
     // relies on garbage collection only.
     // lua_closethread(..., NULL) was introduced in 5.4.6 to replace
     // lua_resetthread() but it's not mandatory yet (maybe in 5.5?)
+#ifdef LUA_HACK_RESETTHREAD_2ARG
+    // Fedora 34 and F36 have identical lau.h, except for this one API change on F36.
+    // So, you cannot check any versioning info.
+    // To get this to compile on this broken lau, edit lua.h and/or otherwise
+    // define LUA_HACK_RESETTHREAD_2ARG so we call this version.
+    lua_resetthread(L1, NULL);
+#else
     lua_resetthread(L1);
+#endif
 #endif
     // The thread was pushed onto the global stack when created. Each thread
     // should be taken off the stack in order.
